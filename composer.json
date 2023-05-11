@@ -1,0 +1,17 @@
+{
+  "name": "alinejati/electro-router",
+  "description": "simple PHP Router",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "aliNejati-bu",
+      "email": "electrocellco@gmail.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Electro\\Extra\\": "src"
+    }
+  }
+}
