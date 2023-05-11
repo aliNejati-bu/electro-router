@@ -19,15 +19,30 @@ class RouteInstance
      */
     public string $methode;
 
+    /**
+     * @param string $path
+     * @param string $name
+     * @param string $methode
+     */
     public function __construct(
         string $path,
-        string $name,
         string $methode,
+        string $name = "",
     )
     {
         $this->methode = $methode;
         $this->path = $path;
         $this->name = $name;
+    }
+
+    /**
+     * @param string $name
+     * @return RouteInstance
+     */
+    public function name(string $name): RouteInstance
+    {
+        $this->name = $name;
+        return $this;
     }
 
 }
