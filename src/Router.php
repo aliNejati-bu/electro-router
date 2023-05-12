@@ -8,6 +8,12 @@ use Electro\Extra\Exception\RouteNotFounded;
 
 class Router
 {
+
+    /**
+     * @var Closure|null
+     */
+    private ?Closure $_404 = null;
+
     /**
      * @var RouteInstance[]
      */
@@ -129,8 +135,9 @@ class Router
                 else
                     throw new MiddlewareError('false returned.');
             }
+
         }
-        return $this->routes;
+        return call_user_func($this->_404);
     }
 
     /**
@@ -192,5 +199,14 @@ class Router
         }
 
         return $flag;
+    }
+
+    /**
+     * @param Closure $closure
+     * @return void
+     */
+    public function set404(Closure $closure): void
+    {
+        $this->_404 = $closure;
     }
 }
