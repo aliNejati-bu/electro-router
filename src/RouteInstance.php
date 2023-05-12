@@ -45,12 +45,27 @@ class RouteInstance
     }
 
     /**
+     * @var Closure[]
+     */
+    public array $middlewares = [];
+
+    /**
      * @param string $name
      * @return RouteInstance
      */
     public function name(string $name): RouteInstance
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @param Closure[] $m
+     * @return RouteInstance
+     */
+    public function addMiddlewares(array $m): RouteInstance
+    {
+        $this->middlewares = array_merge($this->middlewares, $m);
         return $this;
     }
 

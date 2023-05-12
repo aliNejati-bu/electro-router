@@ -3,6 +3,7 @@
 namespace Electro\Extra;
 
 use Closure;
+use Electro\Extra\Exception\MiddlewareError;
 use Electro\Extra\Exception\RouteNotFounded;
 
 class Router
@@ -14,6 +15,11 @@ class Router
 
     public string $prefix = '';
 
+    /**
+     * @var Closure[]
+     */
+    public array $pMiddlewares = [];
+
     private function addRoute(string $path, string|array|Closure $handler, string $methode, string $name = ""): RouteInstance
     {
         $path = $this->prefix . $path;
@@ -23,6 +29,7 @@ class Router
             $handler,
             $name,
         );
+        $i->addMiddlewares($this->pMiddlewares);
         $this->routes[] = $i;
         return $i;
     }
@@ -78,6 +85,12 @@ class Router
     }
 
 
+    /**
+     * @param string $server
+     * @param string $methode
+     * @return mixed
+     * @throws MiddlewareError
+     */
     public function run(string $server, string $methode): mixed
     {
         $url = filter_var($server, FILTER_SANITIZE_URL);
@@ -110,7 +123,11 @@ class Router
             }
             if ($flag) {
                 $params[] = $namedParams;
-                return call_user_func_array($route->handler, $params);
+                $f = $this->callMiddlewares($route);
+                if ($f)
+                    return call_user_func_array($route->handler, $params);
+                else
+                    throw new MiddlewareError('false returned.');
             }
         }
         return $this->routes;
@@ -152,5 +169,28 @@ class Router
         $this->prefix = $prefix . $this->prefix;
         $closure($this);
         $this->prefix = $lastF;
+    }
+
+    public function middleware(Closure $mid, Closure $closure): void
+    {
+        $l = $this->pMiddlewares;
+        $this->pMiddlewares[] = $mid;
+        $closure($this);
+        $this->pMiddlewares = $l;
+    }
+
+
+    private function callMiddlewares(RouteInstance $routeInstance): bool
+    {
+        $flag = true;
+        foreach ($routeInstance->middlewares as $middleware) {
+            $result = $middleware();
+            if (!$result) {
+                $flag = false;
+                break;
+            }
+        }
+
+        return $flag;
     }
 }

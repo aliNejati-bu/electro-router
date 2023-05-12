@@ -11,7 +11,11 @@ $route->get('/', function () use ($route) {
 $route->group('/app', function (\Electro\Extra\Router $router) {
     $router->get('/reza', function () {
         return "yes";
-    });
+    })->addMiddlewares([
+        function () {
+            return false;
+        }
+    ]);
 });
 $route->post('/:app/test', function () {
 
