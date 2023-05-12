@@ -8,10 +8,12 @@
       "email": "electrocellco@gmail.com"
     }
   ],
-  "require": {},
   "autoload": {
     "psr-4": {
       "Electro\\Extra\\": "src"
     }
+  },
+  "require": {
+    "php": "8.1"
   }
 }
