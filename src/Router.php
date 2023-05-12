@@ -3,6 +3,7 @@
 namespace Electro\Extra;
 
 use Closure;
+use Electro\Extra\Exception\RouteNotFounded;
 
 class Router
 {
@@ -115,4 +116,33 @@ class Router
         return $this->routes;
     }
 
+    /**
+     * @throws RouteNotFounded
+     */
+    public function route(string $name, array $params, string $default = ''): string|bool
+    {
+        $route = null;
+        foreach ($this->routes as $routeInstance) {
+            if ($routeInstance->name == $name) {
+                $route = $routeInstance;
+            }
+        }
+        if ($route == null) {
+            return $default;
+        }
+
+        $route_parts = explode('/', $route->path);
+        array_shift($route_parts);
+        for ($i = 0; $i < count($route_parts); $i++) {
+            $route_part = $route_parts[$i];
+            if (str_starts_with($route_part, ':')) {
+                if (!isset($params[0])) {
+                    throw new RouteNotFounded('Route ' . $name . ' Not Founded.');
+                }
+                $route_parts[$i] = $params[0];
+                array_shift($params);
+            }
+        }
+        return '/' . implode('/', $route_parts);
+    }
 }
