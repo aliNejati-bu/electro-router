@@ -2,6 +2,8 @@
 
 namespace Electro\Extra;
 
+use Closure;
+
 class RouteInstance
 {
     /**
@@ -20,19 +22,26 @@ class RouteInstance
     public string $methode;
 
     /**
+     * @var string|array|Closure
+     */
+    public string|array|Closure $handler;
+
+    /**
      * @param string $path
      * @param string $name
      * @param string $methode
      */
     public function __construct(
-        string $path,
-        string $methode,
-        string $name = "",
+        string               $path,
+        string               $methode,
+        string|array|Closure $handler,
+        string               $name = "",
     )
     {
         $this->methode = $methode;
         $this->path = $path;
         $this->name = $name;
+        $this->handler = $handler;
     }
 
     /**
