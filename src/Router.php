@@ -145,4 +145,12 @@ class Router
         }
         return '/' . implode('/', $route_parts);
     }
+
+    public function group(string $prefix, Closure $closure): void
+    {
+        $lastF = $this->prefix;
+        $this->prefix = $prefix . $this->prefix;
+        $closure($this);
+        $this->prefix = $lastF;
+    }
 }
