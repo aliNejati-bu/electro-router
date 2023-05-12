@@ -11,9 +11,11 @@ class Router
      */
     protected array $routes;
 
+    public string $prefix = '';
 
     private function addRoute(string $path, string|array|Closure $handler, string $methode, string $name = ""): RouteInstance
     {
+        $path = $this->prefix . $path;
         $i = new RouteInstance(
             $path,
             $methode,
@@ -34,7 +36,7 @@ class Router
         );
     }
 
-    public function post(string $path, string|array $handler, string $name = ''): RouteInstance
+    public function post(string $path, string|array|Closure $handler, string $name = ''): RouteInstance
     {
         return $this->addRoute(
             $path,
@@ -44,7 +46,38 @@ class Router
         );
     }
 
-    public function run(string $server): mixed
+    public function patch(string $path, string|array|Closure $handler, string $name = ''): RouteInstance
+    {
+        return $this->addRoute(
+            $path,
+            $handler,
+            "PATCH",
+            $name
+        );
+    }
+
+    public function delete(string $path, string|array|Closure $handler, string $name = ''): RouteInstance
+    {
+        return $this->addRoute(
+            $path,
+            $handler,
+            "DELETE",
+            $name
+        );
+    }
+
+    public function put(string $path, string|array|Closure $handler, string $name = ''): RouteInstance
+    {
+        return $this->addRoute(
+            $path,
+            $handler,
+            "PUT",
+            $name
+        );
+    }
+
+
+    public function run(string $server, string $methode): mixed
     {
         $url = filter_var($server, FILTER_SANITIZE_URL);
         $url = rtrim($url, '/');
@@ -53,6 +86,31 @@ class Router
         array_shift($url_parts);
         foreach ($this->routes as $route) {
             $route_parts = explode('/', $route->path);
+            array_shift($route_parts);
+            if ($route_parts[0] == '' && count($url_parts) == 0) {
+                return call_user_func($route->handler);
+            }
+            if (count($route_parts) != count($url_parts) || $route->methode != $methode) {
+                continue;
+            }
+            $params = [];
+            $namedParams = [];
+            $flag = true;
+            for ($__i__ = 0; $__i__ < count($route_parts); $__i__++) {
+                $route_part = $route_parts[$__i__];
+                if (str_starts_with($route_part, ':')) {
+                    $route_part = ltrim($route_part, ':');
+                    $params[] = $url_parts[$__i__];
+                    $namedParams[$route_part] = $url_parts[$__i__];
+                } else if ($route_parts[$__i__] != $url_parts[$__i__]) {
+                    $flag = false;
+                    break;
+                }
+            }
+            if ($flag) {
+                $params[] = $namedParams;
+                return call_user_func_array($route->handler, $params);
+            }
         }
         return $this->routes;
     }
