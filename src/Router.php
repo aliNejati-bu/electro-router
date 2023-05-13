@@ -108,7 +108,11 @@ class Router
             $route_parts = explode('/', $route->path);
             array_shift($route_parts);
             if ($route_parts[0] == '' && count($url_parts) == 0) {
-                return call_user_func($route->handler);
+                $f = $this->callMiddlewares($route);
+                if ($f === true)
+                    return call_user_func_array($route->handler, []);
+                else
+                    return $f;
             }
             if (count($route_parts) != count($url_parts) || $route->methode != $methode) {
                 continue;
@@ -187,18 +191,16 @@ class Router
     }
 
 
-    private function callMiddlewares(RouteInstance $routeInstance): bool
+    private function callMiddlewares(RouteInstance $routeInstance): mixed
     {
         $flag = true;
         foreach ($routeInstance->middlewares as $middleware) {
             $result = $middleware();
             if ($result !== true) {
-                $flag = false;
-                break;
+                return $result;
             }
         }
-
-        return $flag;
+        return true;
     }
 
     /**

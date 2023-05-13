@@ -6,7 +6,11 @@ $route = new \Electro\Extra\Router();
 
 $route->get('/', function () {
     return "index";
-});
+})->addMiddlewares([
+    function () {
+        return true;
+    }
+]);
 
 $route->get("/app/:id", function ($id) {
     return "id";
