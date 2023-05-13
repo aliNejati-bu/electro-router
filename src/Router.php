@@ -130,10 +130,10 @@ class Router
             if ($flag) {
                 $params[] = $namedParams;
                 $f = $this->callMiddlewares($route);
-                if ($f)
+                if ($f === true)
                     return call_user_func_array($route->handler, $params);
                 else
-                    throw new MiddlewareError('false returned.');
+                    return $f;
             }
 
         }
@@ -192,7 +192,7 @@ class Router
         $flag = true;
         foreach ($routeInstance->middlewares as $middleware) {
             $result = $middleware();
-            if (!$result) {
+            if ($result !== true) {
                 $flag = false;
                 break;
             }
