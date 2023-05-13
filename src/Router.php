@@ -174,12 +174,21 @@ class Router
         return '/' . implode('/', $route_parts);
     }
 
-    public function group(string $prefix, Closure $closure): void
+    /**
+     * @param string $prefix
+     * @param Closure $closure
+     * @param Closure[] $middlewares
+     * @return void
+     */
+    public function group(string $prefix, Closure $closure, array $middlewares = []): void
     {
         $lastF = $this->prefix;
+        $lastM = $this->pMiddlewares;
         $this->prefix = $prefix . $this->prefix;
+        $this->pMiddlewares = array_merge($this->pMiddlewares, $middlewares);
         $closure($this);
         $this->prefix = $lastF;
+        $this->pMiddlewares = $lastM;
     }
 
     public function middleware(Closure $mid, Closure $closure): void
