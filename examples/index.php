@@ -20,6 +20,13 @@ $route->get("/redirect", function () use ($route) {
     header('Location: ' . $route->route('id', ["12"]));
 });
 
+$route->group('/api', function (\Electro\Extra\Router $router) {
+
+    $router->get('/', function () {
+        return 'in api group.';
+    });
+});
+
 $route->set404(function () {
     return "404";
 });

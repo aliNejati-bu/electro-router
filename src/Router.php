@@ -28,6 +28,9 @@ class Router
 
     private function addRoute(string $path, string|array|Closure $handler, string $methode, string $name = ""): RouteInstance
     {
+        if ($this->prefix != '' && $path == '/') {
+            $path = '';
+        }
         $path = $this->prefix . $path;
         $i = new RouteInstance(
             $path,
@@ -184,7 +187,7 @@ class Router
     {
         $lastF = $this->prefix;
         $lastM = $this->pMiddlewares;
-        $this->prefix = $prefix . $this->prefix;
+        $this->prefix = $this->prefix . $prefix;
         $this->pMiddlewares = array_merge($this->pMiddlewares, $middlewares);
         $closure($this);
         $this->prefix = $lastF;
