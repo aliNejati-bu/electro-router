@@ -4,7 +4,7 @@ require "../vendor/autoload.php";
 $route = new \Electro\Extra\Router();
 
 
-$route->get('/', function () {
+$route->post('/', function () {
     return "index";
 })->addMiddlewares([
     function () {
@@ -13,11 +13,11 @@ $route->get('/', function () {
 ]);
 
 $route->get("/app/:id", function ($id) {
-    return "id";
+    return $id;
 })->name('id');
 
 $route->get("/redirect", function () use ($route) {
-    header('Location: ' . $route->route('id', ["12"]));
+    header('Location: ' . $route->route('id', ["55"]));
 });
 
 $route->group('/api', function (\Electro\Extra\Router $router) {

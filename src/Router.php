@@ -106,16 +106,15 @@ class Router
         $url = rtrim($url, '/');
         $url = strtok($url, '?');
         $url_parts = explode('/', $url);
+
+
         array_shift($url_parts);
         foreach ($this->routes as $route) {
-            $route_parts = explode('/', $route->path);
+            $path = rtrim($route->path);
+            $route_parts = explode('/', $path);
             array_shift($route_parts);
-            if ($route_parts[0] == '' && count($url_parts) == 0) {
-                $f = $this->callMiddlewares($route);
-                if ($f === true)
-                    return call_user_func_array($route->handler, []);
-                else
-                    return $f;
+            if ($route_parts[0] == "") {
+                array_shift($route_parts);
             }
             if (count($route_parts) != count($url_parts) || $route->methode != $methode) {
                 continue;
